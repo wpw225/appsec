@@ -79,7 +79,7 @@ START_TEST(test_check_words_special_chars)
 {
     hashmap_t hashtable[HASH_SIZE];
     load_dictionary(DICTIONARY, hashtable);
-    char* expected[3];
+//    char* expected[3];
 
 // test2.txt have special characters before and after words.  Test program for proper removal of special
 // characters prior to dictionary lookup.
@@ -171,7 +171,7 @@ START_TEST(test_check_numbers)
 {
     hashmap_t hashtable[HASH_SIZE];
     load_dictionary(DICTIONARY, hashtable);
-    char* expected[3];
+//    char* expected[3];
 
 // test6.txt have numbers within the sentence.  Test program for proper handling
 // of numbers in dictionary lookup.
