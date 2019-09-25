@@ -1,4 +1,12 @@
-language: c
-install: make get-deps
-compiler: gcc
-script: make test
+before_install: 
+  - sudo apt-get update
+  - test -n $CC && unset CC
+install: 
+  - make get-deps
+language: 
+  - c
+compiler: 
+  - gcc
+script:
+  - make        
+  - make test
