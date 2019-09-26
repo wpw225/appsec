@@ -10,7 +10,7 @@ dictionary.o: dictionary.c
 spell.o: spell.c
 	gcc -Wall -c spell.c
 
-test.o: test_main.c
+test_main.o: test_main.c
 	gcc -Wall -c test_main.c
 
 main.o: main.c
