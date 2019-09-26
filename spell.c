@@ -123,16 +123,20 @@ bool check_word(const char* word, hashmap_t hashtable[])
 // Do not check numbers 
 
                 if ( isNumeric(new_word) ) {
+			free(new_word);
+			new_word=NULL;
                         return true;
                 }
 
 
 // Set pointer to bucket_list where dictionary word might be stored
 
-	node * bucket_list = hashtable[get_bucket_num(new_word)];
+	node* bucket_list = hashtable[get_bucket_num(new_word)];
 
 	while(bucket_list != NULL) {
 		if (strcmp(bucket_list->word,new_word) == 0) {
+			free(new_word);
+			new_word=NULL;
 //			//printf("True\n");
 			return true;
 		}
@@ -141,6 +145,8 @@ bool check_word(const char* word, hashmap_t hashtable[])
 
 // If the word does not match any dictionary entries in hashtable, reture false.
 
+        free(new_word);
+	new_word=NULL;
 //	printf("False\n");
 	return false;
 }
@@ -319,16 +325,32 @@ int check_words(FILE* fp, hashmap_t hashtable[], char* misspelled[])
 	//printf("num_misspelled: %d\n",num_misspelled);
 	return num_misspelled;
 }
-/*
-node* hashtable[HASH_SIZE];
 
-int main(void) 
+void mem_cleanup(hashmap_t hashtable[], char* misspelled[])
 {
-load_dictionary("wordlist.txt",hashtable);
-FILE *fp = fopen("test3.txt", "r"); 
-char * misspelled[1000];
-check_words(fp,hashtable,misspelled);
-printf("check pun: %d\n",check_word("?word?",hashtable));
+
+        int freed = 0;
+        int i;
+        node* old_node;
+
+        for (i=0;i<MAX_MISSPELLED;++i) {
+                if (misspelled[i] != NULL) {
+                        free(misspelled[i]);
+//                      printf("Freeing %d\n",i);
+                        misspelled[i] = NULL;
+                }
+                ++freed;
+        }
+
+        for (i=0;i<HASH_SIZE;++i) {
+                if (hashtable[i] != NULL)
+                        while (hashtable[i] != NULL) {
+                                old_node = hashtable[i];
+                                hashtable[i] = hashtable[i]->next;
+                                free(old_node);
+                                old_node=NULL;
+                        }
+        }
 
 }
-*/
+

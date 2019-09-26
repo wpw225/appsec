@@ -92,4 +92,6 @@ bool load_dictionary(const char* dictionary_file, hashmap_t hashtable[]);
  **/
 int hash_function(const char* word);
 
+void mem_cleanup(hashmap_t hashtable[], char* misspelled[]);
+
 #endif // DICTIONARY_H

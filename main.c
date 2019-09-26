@@ -15,7 +15,35 @@
 #include "dictionary.h"
 
 node* hashtable[HASH_SIZE];
+/*
+void mem_cleanup(hashmap_t hashtable[], char* misspelled[])
+{
 
+        int freed = 0;
+        int i;
+	node* old_node;
+
+        for (i=0;i<MAX_MISSPELLED;++i) {
+		if (misspelled[i] != NULL) {
+                	free(misspelled[i]);
+//			printf("Freeing %d\n",i);
+                	misspelled[i] = NULL;
+		}
+                ++freed;
+        }
+
+	for (i=0;i<HASH_SIZE;++i) {
+		if (hashtable[i] != NULL) 
+			while (hashtable[i] != NULL) {
+				old_node = hashtable[i];
+				hashtable[i] = hashtable[i]->next;
+				free(old_node);
+				old_node=NULL;
+			}				
+	}
+
+}
+*/
 int main(int argc,char *argv[]) 
 {
 
@@ -27,8 +55,15 @@ int main(int argc,char *argv[])
 	//printf("arg[1]: %s arg[2] %s",argv[1],argv[2]);
 
 	load_dictionary(argv[2],hashtable);
-	FILE *fp = fopen(argv[1], "r"); 
-	char * misspelled[1000];
+	FILE* fp = fopen(argv[1], "r"); 
+
+// Define and initialize the misspelled queue
+
+	char* misspelled[MAX_MISSPELLED];
+	for (int i=0;i<MAX_MISSPELLED;++i)
+		misspelled[i] = NULL;	
+
 	check_words(fp,hashtable,misspelled);
+	mem_cleanup(hashtable,misspelled);
 
 }
