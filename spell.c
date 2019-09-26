@@ -14,6 +14,8 @@
 #include <ctype.h>
 #include "dictionary.h"
 
+#define MAX_DICT_COUNT 3000000
+
 #ifndef HAVE_STRLCPY
 /*
  * '_cups_strlcpy()' - Safely copy two strings.
@@ -73,16 +75,65 @@ int get_bucket_num(const char* word) {
 
 }
 
+bool isNumeric(const char *str) 
+{
+    while(*str != '\0')
+    {
+        if(*str < '0' || *str > '9')
+            return false;
+        str++;
+    }
+    return true;
+}
+
 bool check_word(const char* word, hashmap_t hashtable[])
 {
 
+	char *new_word = (char *) malloc(sizeof(char)*LENGTH);
+	strlcpy(new_word, word,LENGTH);
+
+	//printf("calling value: %s\n",new_word);
+
+// Remove trailing punctuation.
+
+        char *end = new_word + strlen(new_word) - 1;
+        while(end > new_word && ispunct((unsigned char)*end)) end--;
+// Write new null terminator character
+        end[1] = '\0';
+	//printf("new_word remove trailing: %s\n",new_word);
+
+// Remove leading punctuation.
+
+        int index=0;
+        while( ispunct(new_word[index]) ) index++;
+        if (index != 0) {
+        	int i=0;
+                while(new_word[i + index] != '\0') {
+                	new_word[i] = new_word[i + index];
+                        i++;
+                }
+                new_word[i] = '\0';
+        }
+        //printf("new_word remove leading: %s\n",new_word);
+
+// Convert first character of word to lower case 
+
+	new_word[0] = tolower(new_word[0]);
+
+// Do not check numbers 
+
+                if ( isNumeric(new_word) ) {
+                        return true;
+                }
+
+
 // Set pointer to bucket_list where dictionary word might be stored
 
-	node * bucket_list = hashtable[get_bucket_num(word)];
+	node * bucket_list = hashtable[get_bucket_num(new_word)];
 
 	while(bucket_list != NULL) {
-		if (strcmp(bucket_list->word,word) == 0) {
-//			printf("True\n");
+		if (strcmp(bucket_list->word,new_word) == 0) {
+//			//printf("True\n");
 			return true;
 		}
 		bucket_list = bucket_list->next;
@@ -120,10 +171,18 @@ bool load_dictionary(const char* dictionary_file, hashmap_t hashtable[])
     	}
 
 	char dic_word[LENGTH];
+	int count = 0;
 
 //  Read word in dict_file until EOF (end of file):
 
 	while (fgets(dic_word, LENGTH, fptr) != NULL) {
+
+// Limit amount of dictionary entries to 1 million
+
+		if (count >= MAX_DICT_COUNT) 
+			break;
+		else
+			count++;
 
 // Remove newline character from string
 
@@ -138,7 +197,7 @@ bool load_dictionary(const char* dictionary_file, hashmap_t hashtable[])
 //Check if memory has been successfully allocated
 		
 		if (new_node == NULL) {
-			printf("Memory allocation error.\n");
+			//printf("Memory allocation error.\n");
 			exit(0);
 		}
 
@@ -153,7 +212,7 @@ bool load_dictionary(const char* dictionary_file, hashmap_t hashtable[])
 			hashtable[bucket] = new_node;			
 		else {
 			new_node->next=hashtable[bucket];
-			hashtable[bucket]=new_node;
+			hashtable[bucket] = new_node;
 		}
 	}
 
@@ -192,19 +251,22 @@ int check_words(FILE* fp, hashmap_t hashtable[], char* misspelled[])
                         }
 
 			strlcpy(new_word,ptr,LENGTH);
-			//printf("new_word %s %ld\n",new_word,strlen(new_word));
+			// printf("new_word %s %ld\n",new_word,strlen(new_word));
 
 // Remove the rest of very long word from input if the portion read in already is at LENGTH limit
 
 			if (strlen(new_word) >= LENGTH - 1) {
-				//printf("Trimming ...\n");
+			//	printf("Trimming ...\n");
 				while ( true ) {
-     					c = fgetc ( fp ) ; // reading the file
-     					if ( isspace(c) )
+     					c = fgetc(fp); // reading the file
+				//	printf("Removing letter: %d\n",c);
+     					if ( feof(fp) || isspace(c))
      						break ;
 				}
+			//	printf("Finishing Trimming ...\n");
 			}
 
+/* move work cleansing into check_word function
 // Remove trailing punctuation.
 
 			char *end = new_word + strlen(new_word) - 1;
@@ -230,6 +292,7 @@ int check_words(FILE* fp, hashmap_t hashtable[], char* misspelled[])
 				
 // Convert first character of word to lower case
 			new_word[0] = tolower(new_word[0]);
+*/
 
 // Check if word is in hashtable
 			if (!check_word(new_word,hashtable)) {
@@ -238,6 +301,7 @@ int check_words(FILE* fp, hashmap_t hashtable[], char* misspelled[])
 
 				misspelled[num_misspelled] = new_word;
 				++num_misspelled;
+				//printf("Misspelled word: %s\n",new_word);
 
 // Prevent overrunning MAX_MISSPELLED array buffer
 				if (num_misspelled >= MAX_MISSPELLED)
@@ -252,10 +316,9 @@ int check_words(FILE* fp, hashmap_t hashtable[], char* misspelled[])
 			ptr = strtok(NULL,delim);
 		}
 	}
-//	printf("num_misspelled: %d",num_misspelled);
+	//printf("num_misspelled: %d\n",num_misspelled);
 	return num_misspelled;
 }
-
 /*
 node* hashtable[HASH_SIZE];
 
@@ -265,7 +328,7 @@ load_dictionary("wordlist.txt",hashtable);
 FILE *fp = fopen("test3.txt", "r"); 
 char * misspelled[1000];
 check_words(fp,hashtable,misspelled);
+printf("check pun: %d\n",check_word("?word?",hashtable));
 
 }
-
 */
