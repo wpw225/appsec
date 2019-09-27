@@ -75,6 +75,8 @@ int get_bucket_num(const char* word) {
 
 }
 
+
+
 bool isNumeric(const char *str) 
 {
     while(*str != '\0')
@@ -89,8 +91,20 @@ bool isNumeric(const char *str)
 bool check_word(const char* word, hashmap_t hashtable[])
 {
 
+// Replace all non-printable characters with (dot) prior to any checks
+              char printable_word[LENGTH];
+              strlcpy(printable_word,word,LENGTH);
+              int c = 0;
+              while (printable_word[c] != '\0') {
+                      if (printable_word[c] < '!' || printable_word[c] > '~') {
+                              printable_word[c] = '.';
+                      }
+                      c++;
+              }
+
+
 	char *new_word = (char *) malloc(sizeof(char)*LENGTH);
-	strlcpy(new_word, word,LENGTH);
+	strlcpy(new_word, printable_word,LENGTH);
 
 	//printf("calling value: %s\n",new_word);
 
@@ -190,6 +204,17 @@ bool load_dictionary(const char* dictionary_file, hashmap_t hashtable[])
 		else
 			count++;
 
+// Replace all non-printable characters with (dot) prior to placing into hashtable
+              int c = 0;
+		//printf("dic_word before: %s\t",dic_word);
+              while ((dic_word[c] != '\0') && (dic_word[c] != '\n')) {
+                      if (dic_word[c] < '!' || dic_word[c] > '~') {
+                              dic_word[c] = '.';
+                      }
+                      c++;
+              }
+		//printf("dic_word after: %s\t",dic_word);
+
 // Remove newline character from string
 
     		int word_length = strlen(dic_word) -1;
@@ -271,34 +296,6 @@ int check_words(FILE* fp, hashmap_t hashtable[], char* misspelled[])
 				}
 			//	printf("Finishing Trimming ...\n");
 			}
-
-/* move work cleansing into check_word function
-// Remove trailing punctuation.
-
-			char *end = new_word + strlen(new_word) - 1;
-			while(end > new_word && ispunct((unsigned char)*end)) end--;
-// Write new null terminator character
-			end[1] = '\0';
-
-// Remove leading punctuation.
-
-			int index=0;
-			while( ispunct(new_word[index]) ) {
-				index++;
-			}
-			if (index != 0) {
-				int i=0;
-				while(new_word[i + index] != '\0') {
-					new_word[i] = new_word[i + index];
-					i++;
-				}	
-				new_word[i] = '\0';
-			}
-			//printf("new_word %s\n",new_word);
-				
-// Convert first character of word to lower case
-			new_word[0] = tolower(new_word[0]);
-*/
 
 // Check if word is in hashtable
 			if (!check_word(new_word,hashtable)) {
