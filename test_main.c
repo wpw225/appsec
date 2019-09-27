@@ -4,6 +4,7 @@
 
 #define DICTIONARY "wordlist.txt"
 #define TESTDICT "test_worlist.txt"
+#define TESTDICT1 "test_worlist1.txt"
 #define TEST_DICT_MAX "wordlist_x26.txt"
 
 START_TEST(test_dictionary_normal)
@@ -27,6 +28,27 @@ START_TEST(test_dictionary_normal)
 }
 END_TEST
 
+START_TEST(test_dictionary_nonprintable_char)
+{
+    hashmap_t hashtable[HASH_SIZE];
+    ck_assert(load_dictionary(TESTDICT1, hashtable));
+
+    // Here we can test if certain words ended up in certain buckets
+    // to ensure that our load_dictionary works as intended. I leave
+    // this as an exercise.
+
+        // Since there are four entries in the test_worlist.txt,
+        //assuming no collision, each should be in their own bucket.
+
+        int count=0;
+        int i=0;
+        for (i=0;i<HASH_SIZE;++i) {
+                if (hashtable[i] != NULL) ++count;
+        }
+        ck_assert_int_eq(count,5);
+}
+END_TEST
+
 START_TEST(test_check_word_normal)
 {
     hashmap_t hashtable[HASH_SIZE];
@@ -46,6 +68,8 @@ START_TEST(test_check_word_normal)
 	ck_assert(check_word(punctuations_after_word, hashtable));
 }
 END_TEST
+
+
 
 START_TEST(test_check_words_normal)
 {
@@ -91,6 +115,21 @@ START_TEST(test_check_words_special_chars)
 }
 END_TEST
 
+START_TEST(test_check_words_nonprintable_chars)
+{
+    hashmap_t hashtable[HASH_SIZE];
+    load_dictionary(DICTIONARY, hashtable);
+//    char* expected[3];
+
+// test2.txt have special characters before and after words.  Test program for proper removal of special
+// characters prior to dictionary lookup.
+
+    char *misspelled[MAX_MISSPELLED];
+    FILE *fp = fopen("test7.txt", "r");
+    int num_misspelled = check_words(fp, hashtable, misspelled);
+    ck_assert(num_misspelled == 4);
+}
+END_TEST
 
 START_TEST(test_input_buffer_overflow)
 {
@@ -204,6 +243,8 @@ check_word_suite(void)
 	tcase_add_test(check_word_case, test_check_words_special_chars);
 	tcase_add_test(check_word_case, test_dictionary_buffer_overflow);
 	tcase_add_test(check_word_case, test_check_numbers);
+	tcase_add_test(check_word_case, test_dictionary_nonprintable_char);
+	tcase_add_test(check_word_case, test_check_words_nonprintable_chars);
 
     suite_add_tcase(suite, check_word_case);
 
