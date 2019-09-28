@@ -1,0 +1,82 @@
+spell.c: (in function strlcpy)
+spell.c:47:11: Parameter 1 (dst) to function memcpy is declared unique but may
+                  be aliased externally by parameter 2 (src)
+  A unique or only parameter may be aliased by some other parameter or visible
+  global. (Use -mayaliasunique to inhibit warning)
+spell.c: (in function get_bucket_num)
+spell.c:63:23: Passed storage lcase_word not completely defined (*lcase_word is
+                  undefined): strlcpy (lcase_word, ...)
+  Storage derivable from a parameter, return value or global is not defined.
+  Use /*@out@*/ to denote passed or returned storage which need not be defined.
+  (Use -compdef to inhibit warning)
+spell.c:63:15: Return value (type size_t) ignored: strlcpy(lcase_wo...
+  Result returned by function call is not used. If this is intended, can cast
+  result to (void) to eliminate message. (Use -retvalother to inhibit warning)
+spell.c:67:47: Incompatible types for + (char, int): lcase_word[c] + 32
+  To make char and int types equivalent, use +charint.
+spell.c: (in function check_word)
+spell.c:96:23: Passed storage printable_word not completely defined
+                  (*printable_word is undefined): strlcpy (printable_word, ...)
+spell.c:96:15: Return value (type size_t) ignored: strlcpy(printabl...
+spell.c:107:10: Possibly null storage new_word passed as non-null param:
+                   strlcpy (new_word, ...)
+  A possibly null pointer is passed as a parameter corresponding to a formal
+  parameter with no /*@null@*/ annotation.  If NULL may be used for this
+  parameter, add a /*@null@*/ annotation to the function parameter declaration.
+  (Use -nullpass to inhibit warning)
+   spell.c:106:19: Storage new_word may become null
+spell.c:107:10: Passed storage new_word not completely defined (*new_word is
+                   undefined): strlcpy (new_word, ...)
+   spell.c:106:52: Storage *new_word allocated
+spell.c:107:2: Return value (type size_t) ignored: strlcpy(new_word...
+spell.c: (in function load_dictionary)
+spell.c:220:25: Variable word_length initialized to type arbitrary unsigned
+                   integral type, expects int: strlen(dic_word) - 1
+  To allow arbitrary integral types to match any integral type, use
+  +matchanyintegral.
+spell.c:235:11: Passed storage new_node->word not completely defined
+    (*(new_node->word) is undefined): strlcpy (new_node->word, ...)
+spell.c:235:3: Return value (type size_t) ignored: strlcpy(new_node...
+spell.c:236:3: Implicitly only storage new_node->next (type struct node *) not
+                  released before assignment: new_node->next = NULL
+  A memory leak has been detected. Only-qualified storage is not released
+  before the last reference to it is lost. (Use -mustfreeonly to inhibit
+  warning)
+spell.c:252:2: Return value (type int) ignored: fclose(fptr)
+  Result returned by function call is not used. If this is intended, can cast
+  result to (void) to eliminate message. (Use -retvalint to inhibit warning)
+spell.c:253:8: Return value type int does not match declared type bool: (1)
+  Types are incompatible. (Use -type to inhibit warning)
+spell.c: (in function check_words)
+spell.c:284:12: Passed storage new_word not completely defined (*new_word is
+                   undefined): strlcpy (new_word, ...)
+   spell.c:278:74: Storage *new_word allocated
+spell.c:284:4: Return value (type size_t) ignored: strlcpy(new_word...
+spell.c:292:11: Assignment of int to char: c = fgetc(fp)
+spell.c:294:16: Left operand of || is non-boolean (int): feof(fp) || isspace(c)
+  The operand of a boolean operator is not a boolean. Use +ptrnegate to allow !
+  to be used on pointers. (Use -boolops to inhibit warning)
+spell.c: (in function mem_cleanup)
+spell.c:346:33: Only storage hashtable[]->next assigned to implicitly temp:
+                   hashtable[i] = hashtable[i]->next
+  The only reference to this storage is transferred to another reference (e.g.,
+  by returning it) that does not have the only annotation. This may lead to a
+  memory leak, since the new reference is not necessarily released. (Use
+  -onlytrans to inhibit warning)
+spell.c:347:38: Only storage old_node->next (type struct node *) derived from
+                   released storage is not released (memory leak): old_node
+  A storage leak due to incomplete deallocation of a structure or deep pointer
+  is suspected. Unshared storage that is reachable from a reference that is
+  being deallocated has not yet been deallocated. Splint assumes when an object
+  is passed as an out only void pointer that the outer object will be
+  deallocated, but the inner objects will not. (Use -compdestroy to inhibit
+  warning)
+spell.c:29:1: Function exported but not used outside spell: strlcpy
+  A declaration is exported, but not used outside this module. Declaration can
+  use static qualifier. (Use -exportlocal to inhibit warning)
+   spell.c:51:1: Definition of strlcpy
+spell.c:58:5: Function exported but not used outside spell: get_bucket_num
+   spell.c:76:1: Definition of get_bucket_num
+spell.c:80:6: Function exported but not used outside spell: isNumeric
+   spell.c:89:1: Definition of isNumeric
+
